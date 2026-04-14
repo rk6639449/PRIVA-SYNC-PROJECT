@@ -53,13 +53,28 @@ const logInUser = async (req, res) => {
 
 
     } catch (error) {
-        res.status(500).json({message:"Internal Server Error",error})
+        res.status(500).json({ message: "Internal Server Error", error })
     }
 
 
 }
 
+const logOutUser = async (req, res) => {
+    try {
+        const { email } = req.body;
+        const user = await User.findOne({ email: email.toLowerCase() })
+        if (!user) return res.status(400).json({ message: "User doesn't exists" })
+        return res.status(201).json({
+            message: "Logged out successfully"
+        });
+
+    } catch (error) {
+        res.status(500).json({ message: "Internal Server Error", error })
+    }
+}
+
 export {
     registerUser,
-    logInUser
+    logInUser,
+    logOutUser
 }
