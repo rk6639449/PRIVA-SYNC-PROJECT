@@ -1,11 +1,9 @@
 import { useState, useRef, useEffect } from 'react';
 import './App.css';
 import axios from "axios";
+import ReactMarkdown from 'react-markdown';
 
-// Simple chatbot logic
-const Chatbot = (input) => {
-  return "Hello! I am a simulation. You said: " + input;
-};
+
 function RegisterForm({ onClose, onLoginClick }) {
   const [formData, setFormData] = useState({
     username: "",
@@ -183,13 +181,13 @@ function LoginForm({ onClose, onLoginSuccess }) {
 
       console.log("Login Response:", res.data);
 
-      // ✅ store token
+    
       if (res.data.token) {
         localStorage.setItem("token", res.data.token);
       }
       localStorage.setItem("user", JSON.stringify(res.data.user));
 
-      // ✅ show success UI
+     
       setSuccess(res.data.message);
       onLoginSuccess(res.data.user);
 
@@ -212,7 +210,7 @@ function LoginForm({ onClose, onLoginSuccess }) {
         <div className="form-container">
 
           {success ? (
-            // ✅ SUCCESS UI
+         
             <div>
               <h2>Success</h2>
               <p>{success}</p>
@@ -228,7 +226,7 @@ function LoginForm({ onClose, onLoginSuccess }) {
               </button>
             </div>
           ) : (
-            // ✅ LOGIN FORM (same UI style)
+            
             <form onSubmit={handleSubmit}>
               <h2>Login</h2>
 
@@ -353,10 +351,20 @@ function HomeGrid() {
 
 function ChatMessage({ message, sender }) {
   return (
-    <div className={sender === 'user' ? 'chat-message-user' : 'chat-message-robot'}>
-      {sender === "robot" && <div className="avatar bot-avatar">🤖</div>}
-      <div className="chat-message-text">{message}</div>
-      {sender === "user" && <div className="avatar user-avatar">👤</div>}
+    <div className={`chat-row ${sender}`}>
+      
+      {sender === "robot" && (
+        <div className="avatar bot-avatar">🤖</div>
+      )}
+
+      <div className="chat-bubble">
+        <ReactMarkdown>{message}</ReactMarkdown>
+      </div>
+
+      {sender === "user" && (
+        <div className="avatar user-avatar">👤</div>
+      )}
+
     </div>
   );
 }
@@ -403,7 +411,7 @@ function App() {
     id: crypto.randomUUID()
   };
 
-  // show user message instantly
+ 
   setChatMessages(prev => [...prev, userMessage]);
 
   try {
@@ -434,7 +442,7 @@ function App() {
     setChatMessages(prev => [
       ...prev,
       {
-        message: "⚠️ Error getting response",
+        message: " Error getting response !!",
         sender: 'robot',
         id: crypto.randomUUID()
       }
@@ -444,8 +452,8 @@ function App() {
   setInputText('');
 };
   const handleNewChat = () => {
-    setChatMessages([]);   // clear chat
-    setInputText("");      // clear input
+    setChatMessages([]);   
+    setInputText("");     
   };
 
   return (
@@ -465,7 +473,7 @@ function App() {
       />
 
       <main className="main-content">
-        {/* If no messages, show the grid. If messages exist, show the chat history */}
+        
         {showRegister && (
           <RegisterForm
             onClose={() => setShowRegister(false)}

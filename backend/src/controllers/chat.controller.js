@@ -9,7 +9,7 @@ const openai = new OpenAI({
 const generateResponse = async (req, res) => {
   try {
     const { message } = req.body;
-    const userId = req.user.id;   // ✅ FIX ADDED
+    const userId = req.user.id;  
 
     if (!message) {
       return res.status(400).json({ message: "Enter message!" });

@@ -3,7 +3,7 @@ import cors from "cors";
 const app = express(); 
 app.use(express.json());
 app.use(cors({
-  origin: "http://localhost:5173" // your frontend URL
+  origin: "http://localhost:5173" 
 }));
 
 import userRouter from './routes/user.route.js'
