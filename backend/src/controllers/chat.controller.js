@@ -1,4 +1,6 @@
 import OpenAI from "openai";
+import { Chat } from "../models/chat.model.js";
+
 
 const openai = new OpenAI({
   apiKey: process.env.OPENROUTER_API_KEY,
@@ -8,19 +10,25 @@ const openai = new OpenAI({
 const generateResponse = async (req, res) => {
   try {
     const { prompt } = req.body;
+    const userId = req.user.id; 
 
     if (!prompt) {
       return res.status(400).json({ message: "Enter message!" });
     }
 
     const response = await openai.chat.completions.create({
-      model:"openrouter/elephant-alpha",  // ✅ FREE model
+      model:"openrouter/elephant-alpha", 
       messages: [{ role: "user", content: prompt }],
     });
 
     const reply = response.choices[0].message.content;
+    const chat = await Chat.create({
+            user: userId,
+            message:prompt,
+            response:reply
+        });
 
-    res.json({ reply });
+    res.json({ chat });
 
   } catch (error) {
     console.error(error);

@@ -1,133 +1,122 @@
 import { useState, useRef, useEffect } from 'react';
 import './App.css';
 
-// Simple chatbot function
+// Simple chatbot logic
 const Chatbot = (input) => {
-  return "Hello " + input;
+  return "Hello! I am a simulation. You said: " + input;
 };
 
-function ChatInput({ chatMessages, setChatMessages }) {
-  const [inputText, setInputText] = useState('');
-
-  function saveInputText(event) {
-    setInputText(event.target.value);
-  }
-
-  function SendMessage() {
-    if (!inputText.trim()) return;
-
-    const userMessage = {
-      message: inputText,
-      sender: 'user',
-      id: crypto.randomUUID()
-    };
-
-    const response = Chatbot(inputText);
-
-    const botMessage = {
-      message: response,
-      sender: 'robot',
-      id: crypto.randomUUID()
-    };
-
-    setChatMessages([
-      ...chatMessages,
-      userMessage,
-      botMessage
-    ]);
-
-    setInputText('');
-  }
-
-  function pass_input(event) {
-    if (event.key === 'Enter') {
-      SendMessage();
-    }
-  }
-
+function Sidebar() {
   return (
-    <div className="chat-input-container">
-      <input
-        onChange={saveInputText}
-        value={inputText}
-        placeholder="Send a message to Chatbot"
-        className="chat-input"
-        onKeyDown={pass_input}
-      />
-      <button onClick={SendMessage} className="send-btn">
-        Send
-      </button>
+    <aside className="sidebar">
+      <button className="new-chat">+ New chat</button>
+      <div className="sidebar-footer">
+        <div className="nav-item">☼ Light mode</div>
+        <div className="nav-item">Register</div>
+        <div className="nav-item">Sign In</div>
+        <div className="nav-item">About</div>
+      </div>
+    </aside>
+  );
+}
+
+function HomeGrid() {
+  return (
+    <div className="home-grid">
+      <h1 className="main-title">ChatBuddy</h1>
+      <div className="grid-container">
+        <div className="column">
+          <div className="icon">☼</div>
+          <h3>Examples</h3>
+          <div className="card">"How to learn Machine learning..." →</div>
+          <div className="card">"How to learn Figma..." →</div>
+          <div className="card">"What is blackhole ?" →</div>
+        </div>
+        <div className="column">
+          <div className="icon">⚡</div>
+          <h3>Capabilities</h3>
+          <div className="card">Give answers based on keywords</div>
+          <div className="card">Simulate ChatGPT answers</div>
+          <div className="card">Simulate OpenAI universe</div>
+        </div>
+        <div className="column">
+          <div className="icon">⚠</div>
+          <h3>Limitations</h3>
+          <div className="card">It's not an AI</div>
+          <div className="card">Limited keyword answers</div>
+          <div className="card">No real conversation</div>
+        </div>
+      </div>
     </div>
   );
 }
 
 function ChatMessage({ message, sender }) {
   return (
-    <div className={sender === 'user'
-      ? 'chat-message-user'
-      : 'chat-message-robot'}>
-      
-      {sender === "robot" && (
-        <img src="robot.png" width="40" height="40" />
-      )}
-
-      <div className="chat-message-text">
-        {message}
-      </div>
-
-      {sender === "user" && (
-        <img src="DefCap.png" width="40" height="40" />
-      )}
-    </div>
-  );
-}
-
-function ChatMessages({ chatMessages }) {
-  const chatMessagesRef = useRef(null);
-
-  useEffect(() => {
-    const container = chatMessagesRef.current;
-    if (container) {
-      container.scrollTop = container.scrollHeight;
-    }
-  }, [chatMessages]);
-
-  return (
-    <div className="chat-messages-container" ref={chatMessagesRef}>
-      {chatMessages.map((msg) => (
-        <ChatMessage
-          key={msg.id}
-          message={msg.message}
-          sender={msg.sender}
-        />
-      ))}
+    <div className={sender === 'user' ? 'chat-message-user' : 'chat-message-robot'}>
+      {sender === "robot" && <div className="avatar bot-avatar">🤖</div>}
+      <div className="chat-message-text">{message}</div>
+      {sender === "user" && <div className="avatar user-avatar">👤</div>}
     </div>
   );
 }
 
 function App() {
-  const [chatMessages, setChatMessages] = useState([
-    {
-      message: 'hello chatbot',
-      sender: 'user',
-      id: 'id1'
-    },
-    {
-      message: 'Hello! How can I help you?',
-      sender: 'robot',
-      id: 'id2'
+  const [chatMessages, setChatMessages] = useState([]);
+  const [inputText, setInputText] = useState('');
+  const chatMessagesRef = useRef(null);
+
+  useEffect(() => {
+    if (chatMessagesRef.current) {
+      chatMessagesRef.current.scrollTop = chatMessagesRef.current.scrollHeight;
     }
-  ]);
+  }, [chatMessages]);
+
+  const SendMessage = () => {
+    if (!inputText.trim()) return;
+
+    const userMessage = { message: inputText, sender: 'user', id: crypto.randomUUID() };
+    const response = Chatbot(inputText);
+    const botMessage = { message: response, sender: 'robot', id: crypto.randomUUID() };
+
+    setChatMessages([...chatMessages, userMessage, botMessage]);
+    setInputText('');
+  };
 
   return (
-    <div className="app-container">
-      <ChatMessages chatMessages={chatMessages} />
-      <ChatInput
-        chatMessages={chatMessages}
-        setChatMessages={setChatMessages}
-      />
+    <div className="app-layout">
+      <Sidebar />
+      
+      <main className="main-content">
+        {/* If no messages, show the grid. If messages exist, show the chat history */}
+        {chatMessages.length === 0 ? (
+          <HomeGrid />
+        ) : (
+          <div className="chat-messages-container" ref={chatMessagesRef}>
+            {chatMessages.map((msg) => (
+              <ChatMessage key={msg.id} message={msg.message} sender={msg.sender} />
+            ))}
+          </div>
+        )}
+
+        <div className="input-area">
+          <div className="input-wrapper">
+            <input
+              onChange={(e) => setInputText(e.target.value)}
+              value={inputText}
+              placeholder="Send a message..."
+              onKeyDown={(e) => e.key === 'Enter' && SendMessage()}
+            />
+            <button onClick={SendMessage} className="send-btn">➤</button>
+          </div>
+          <p className="footer-disclaimer">
+            This project is contributed to PRIVA-SYNC. Developed by Rohit Kumar.
+          </p>
+        </div>
+      </main>
     </div>
   );
 }
 
 export default App;
+
